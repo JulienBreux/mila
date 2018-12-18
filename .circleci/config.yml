@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /ci
     docker:
-      - image: docker:18.06.0-ce-git
+      - image: circleci/golang:1.11.3
     steps:
       - checkout
       - setup_remote_docker
@@ -24,7 +24,7 @@ jobs:
   release:
     working_directory: /ci
     docker:
-      - image: docker:18.06.0-ce-git
+      - image: circleci/golang:1.11.3
     steps:
       - checkout
       - run:
@@ -33,7 +33,7 @@ jobs:
   register:
     working_directory: /ci
     docker:
-      - image: docker:18.06.0-ce-git
+      - image: circleci/golang:1.11.3
     steps:
       - checkout
       - setup_remote_docker
