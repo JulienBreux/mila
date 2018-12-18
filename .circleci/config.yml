@@ -8,7 +8,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Install Go task
-          command: go get -u -v github.com/go-task/task/cmd/task
+          command: curl -s https://taskfile.org/install.sh | sh
       - run:
           name: Building Docker image
           command: task docker:build
@@ -39,7 +39,7 @@ jobs:
           key: docker-image-{{ .Branch }}-{{ .Environment.CIRCLE_TAG }}
       - run:
           name: Install Go task
-          command: go get -u -v github.com/go-task/task/cmd/task
+          command: curl -s https://taskfile.org/install.sh | sh
       - run:
           name: Unarchiving
           command: task docker:load
