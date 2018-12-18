@@ -1,0 +1,25 @@
+version: "2"
+
+vars:
+  GO_GCO_ENABLED: 0
+
+tasks:
+  "build":
+    desc: Build application
+    silent: true
+    cmds:
+      - cmd: |
+          printf 'Getting application dependencies\n'
+          go mod download
+          printf 'Building application for "%s" OS\n' "{{default OS .GO_OS}}"
+          CGO_ENABLED={{default "0" .GO_GCO_ENABLED}} \
+          GOOS={{default OS .GO_OS}} \
+          go build \
+            -a \
+            -ldflags "-X main.built=$(date -u +%Y-%m-%dT%H:%M:%SZ) -X main.version={{.APP_VERSION}} -X main.gitCommit={{.GIT_COMMIT}}" \
+            -o bin-{{.APP_COMMAND}} \
+            ./cmd/{{.APP_COMMAND}}/
+          printf 'Application built "%s"\n' "bin-{{.APP_COMMAND}}"
+    vars:
+      GIT_COMMIT:
+        sh: git log -n 1 --format=%h

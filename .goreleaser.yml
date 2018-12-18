@@ -1,0 +1,46 @@
+before:
+  hooks:
+    - go mod download
+    - go generate ./...
+
+builds:
+  binary: mila
+  main: cmd/mila/main.go
+  env:
+    - CGO_ENABLED=0
+
+archive:
+  replacements:
+    darwin: Darwin
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+
+checksum:
+  name_template: 'mila_checksums.txt'
+
+release:
+  draft: true
+
+snapshot:
+  name_template: "{{ .Tag }}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^tasks:'
+    - '^test:'
+
+nfpm:
+  vendor: Mila
+  homepage: https://github.com/julienbreux/mila
+  maintainer: Julien Breux <julien@golang.fr>
+  description: Mila helps you manage your environment variables
+  license: MIT
+  formats:
+    - deb
+    - rpm
+  name_template: "{{.ProjectName}}_{{.Os}}_{{.Arch}}"

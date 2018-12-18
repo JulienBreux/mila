@@ -1,0 +1,12 @@
+version: "2"
+
+vars:
+  APP_VERSION: "{{if .CIRCLE_TAG}}{{.CIRCLE_TAG}}{{else}}unknown{{end}}"
+  APP_COMMAND: mila
+  DOCKER_REGISTRY_SERVER: docker.io
+  DOCKER_REGISTRY_ACCOUNT: julienbreux
+  DOCKER_IMAGE_NAME: mila
+
+includes:
+  docker: ./tasks/docker.yml
+  go: ./tasks/go.yml

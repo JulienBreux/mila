@@ -1,0 +1,50 @@
+version: "2"
+
+vars:
+  DOCKER_FILE: Dockerfile
+  DOCKER_IMAGE_FQN: "{{.DOCKER_REGISTRY_SERVER}}/{{.DOCKER_REGISTRY_ACCOUNT}}/{{.DOCKER_IMAGE_NAME}}:{{.APP_VERSION}}"
+  DOCKER_CACHE: false
+  DOCKER_ARCHIVE_DIR: "."
+  DOCKER_ARCHIVE_FILE: "{{.DOCKER_IMAGE_NAME}}.tar"
+
+tasks:
+  "build":
+    desc: Build Docker image
+    silent: true
+    cmds:
+      - cmd: |
+          printf 'Building Docker image in version "%s"\n' "{{.APP_VERSION}}"
+          docker build{{if .DOCKER_CACHE}} --no-cache{{end}} \
+            --build-arg VERSION={{.APP_VERSION}} \
+            --build-arg COMMIT={{.GIT_COMMIT}} \
+            --build-arg DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+            -t {{.DOCKER_IMAGE_FQN}} \
+            -f {{.DOCKER_FILE}} .
+          printf 'Docker image built "%s"\n' "{{.DOCKER_IMAGE_FQN}}"
+    vars:
+      GIT_COMMIT:
+        sh: git log -n 1 --format=%h
+
+  "run":
+    desc: Run Docker image
+    silent: true
+    cmds:
+      - cmd: docker run --rm {{.DOCKER_IMAGE_FQN}}
+
+  "save":
+    desc: Save Docker image to archive
+    silent: true
+    cmds:
+      - cmd: docker save --output "{{.DOCKER_ARCHIVE_DIR}}/{{.DOCKER_ARCHIVE_FILE}}" {{.DOCKER_IMAGE_FQN}}
+
+  "load":
+    desc: Load Docker image from archive
+    silent: true
+    cmds:
+      - cmd: docker load --input "{{.DOCKER_ARCHIVE_DIR}}/{{.DOCKER_ARCHIVE_FILE}}"
+
+  "push":
+    desc: Push Docker image to the registry
+    silent: true
+    cmds:
+      - cmd: docker push {{.DOCKER_IMAGE_FQN}}

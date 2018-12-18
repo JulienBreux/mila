@@ -1,0 +1,82 @@
+version: 2
+jobs:
+  build:
+    working_directory: /ci
+    docker:
+      - image: docker:18.06.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Go task
+          command: go install github.com/go-task/task/cmd/task
+      - run:
+          name: Building Docker image
+          command: task docker:build
+      - run:
+          name: Archiving Docker image
+          command: task docker:save
+      - save_cache:
+          name: Caching Docker image
+          key: docker-image-{{ .Branch }}-{{ .Environment.CIRCLE_TAG }}
+          paths:
+            - /ci/
+  release:
+    working_directory: /ci
+    docker:
+      - image: docker:18.06.0-ce-git
+    steps:
+      - checkout
+      - run:
+          name: Release
+          command: curl -sL http://git.io/goreleaser | bash
+  register:
+    working_directory: /ci
+    docker:
+      - image: docker:18.06.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          name: Restoring Docker image
+          key: docker-image-{{ .Branch }}-{{ .Environment.CIRCLE_TAG }}
+      - run:
+          name: Unarchiving
+          command: task docker:load
+      - run:
+          name: Push images to Docker hub
+          command: task docker:push
+workflows:
+  version: 2
+  default:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
+      - release:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - register:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
