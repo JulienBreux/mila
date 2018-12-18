@@ -1,7 +1,6 @@
 version: 2
 jobs:
   build:
-    working_directory: /ci
     docker:
       - image: circleci/golang:1.11.3
     steps:
@@ -22,7 +21,6 @@ jobs:
           paths:
             - /ci/
   release:
-    working_directory: /ci
     docker:
       - image: circleci/golang:1.11.3
     steps:
@@ -31,7 +29,6 @@ jobs:
           name: Release
           command: curl -sL http://git.io/goreleaser | bash
   register:
-    working_directory: /ci
     docker:
       - image: circleci/golang:1.11.3
     steps:
