@@ -6,11 +6,20 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+
+	"github.com/julienbreux/mila/internal/mila/checker"
+	"github.com/julienbreux/mila/internal/mila/reader"
 )
 
 const (
-	defaultSchemaFlag     = "schema"
-	defaultSchemaFilename = ".mila.yaml"
+	defaultPathLongFlag  = "path"
+	defaultPathShortFlag = "p"
+	defaultPathValue     = "."
+)
+
+var (
+	redString   = color.New(color.FgRed)
+	greenString = color.New(color.FgGreen)
 )
 
 // checkCmd represents the check command
@@ -20,28 +29,41 @@ var checkCmd = &cobra.Command{
 	Long:  "Check command is used to check environment variables.",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Getting flag
-		filename, err := cmd.Flags().GetString(defaultSchemaFlag)
+		path, err := cmd.Flags().GetString(defaultPathLongFlag)
 		if err != nil {
-			color.New(color.FgRed).
-				Printf("✗ Unable to get schema filename flag\n")
-			os.Exit(1)
+			failed("Unable to get schema filename flag\n\t%s", err)
 			return
 		}
 
-		// Checking existing file
-		if _, err := os.Stat(filename); os.IsNotExist(err) {
-			color.New(color.FgRed).
-				Printf("✗ Schema filename \"%s\" not found\n", filename)
-			os.Exit(1)
+		// Reading schema
+		schema, err := reader.Reader(path)
+		if err != nil {
+			failed("%s", err)
 			return
 		}
 
-		fmt.Printf("check command called with filename: %s\n", filename)
+		// Checking schema
+		if err := checker.Checker(schema); err != nil {
+			failed("%s", err)
+			return
+		}
+
+		success("Environment is correct")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(checkCmd)
 
-	checkCmd.Flags().StringP(defaultSchemaFlag, "s", defaultSchemaFilename, "Filename of schema used to check environment variables")
+	checkCmd.Flags().StringP(defaultPathLongFlag, defaultPathShortFlag, defaultPathValue, "Path of Mila schema")
+}
+
+func success(format string, a ...interface{}) {
+	color.New(color.FgGreen).Printf("✓ %s\n", fmt.Sprintf(format, a...))
+	os.Exit(0)
+}
+
+func failed(format string, a ...interface{}) {
+	color.New(color.FgRed).Printf("✗ %s\n", fmt.Sprintf(format, a...))
+	os.Exit(1)
 }
