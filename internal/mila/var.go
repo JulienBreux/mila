@@ -1,6 +1,6 @@
 package mila
 
-// Var represents a var
+// Var represents a variable
 type Var struct {
 	Default     string
 	Type        string
