@@ -5,7 +5,8 @@ jobs:
       - image: circleci/golang:1.11.3
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Install Go task
           command: |
@@ -14,14 +15,6 @@ jobs:
       - run:
           name: Building Docker image
           command: /go/bin/task/task docker:build
-      - run:
-          name: Archiving Docker image
-          command: /go/bin/task/task docker:save
-      - save_cache:
-          name: Caching Docker image
-          key: docker-image-{{ .Branch }}-{{ .Environment.CIRCLE_TAG }}
-          paths:
-            - /ci/
   release:
     docker:
       - image: circleci/golang:1.11.3
@@ -35,18 +28,13 @@ jobs:
       - image: circleci/golang:1.11.3
     steps:
       - checkout
-      - setup_remote_docker
-      - restore_cache:
-          name: Restoring Docker image
-          key: docker-image-{{ .Branch }}-{{ .Environment.CIRCLE_TAG }}
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Install Go task
           command: |
             mkdir /go/bin/task
             curl -s https://taskfile.org/install.sh | sh -s -- -d -b "/go/bin/task"
-      - run:
-          name: Unarchiving
-          command: /go/bin/task/task docker:load
       - run:
           name: Push images to Docker hub
           command: /go/bin/task/task docker:push
