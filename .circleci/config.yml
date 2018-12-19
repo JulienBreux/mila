@@ -9,8 +9,8 @@ jobs:
       - run:
           name: Install Go task
           command: |
-            mkdir "`pwd`/task"
-            curl -s https://taskfile.org/install.sh | sh -s -- -d -b "`pwd`/task"
+            mkdir /go/bin/task
+            curl -s https://taskfile.org/install.sh | sh -s -- -d -b "/go/bin/task"
       - run:
           name: Building Docker image
           command: /go/bin/task/task docker:build
@@ -42,8 +42,8 @@ jobs:
       - run:
           name: Install Go task
           command: |
-            mkdir "`pwd`/task"
-            curl -s https://taskfile.org/install.sh | sh -s -- -d -b "`pwd`/task"
+            mkdir /go/bin/task
+            curl -s https://taskfile.org/install.sh | sh -s -- -d -b "/go/bin/task"
       - run:
           name: Unarchiving
           command: /go/bin/task/task docker:load
