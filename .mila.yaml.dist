@@ -1,0 +1,6 @@
+---
+version: 1
+
+vars:
+  EXAMPLE:
+    required: true
