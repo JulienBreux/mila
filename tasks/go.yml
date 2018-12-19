@@ -2,6 +2,7 @@ version: "2"
 
 vars:
   GO_GCO_ENABLED: 0
+  GO_MODULE: true
 
 tasks:
   "build":
@@ -9,6 +10,7 @@ tasks:
     silent: true
     cmds:
       - cmd: |
+          {{if .GO_MODULE}}export GO111MODULE=on{{end}}
           printf 'Getting application dependencies\n'
           go mod download
           printf 'Building application for "%s" OS\n' "{{default OS .GO_OS}}"
