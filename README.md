@@ -1,6 +1,6 @@
-# mila [![CircleCI](https://badgen.net/circleci/github/JulienBreux/mila/master)](https://circleci.com/gh/JulienBreux/mila)
+# 🎡 mila [![CircleCI](https://badgen.net/circleci/github/JulienBreux/mila/master)](https://circleci.com/gh/JulienBreux/mila)
 
-This is a tool to help you manage your environment variables.
+This is a tool to help you to manage your environment variables.
 
 ## Help
 
