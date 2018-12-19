@@ -8,13 +8,15 @@ jobs:
       - setup_remote_docker
       - run:
           name: Install Go task
-          command: curl -s https://taskfile.org/install.sh | sh
+          command: |
+            mkdir "`pwd`/task"
+            curl -s https://taskfile.org/install.sh | sh -s -- -d -b "`pwd`/task"
       - run:
           name: Building Docker image
-          command: task docker:build
+          command: /go/bin/task/task docker:build
       - run:
           name: Archiving Docker image
-          command: task docker:save
+          command: /go/bin/task/task docker:save
       - save_cache:
           name: Caching Docker image
           key: docker-image-{{ .Branch }}-{{ .Environment.CIRCLE_TAG }}
@@ -39,13 +41,15 @@ jobs:
           key: docker-image-{{ .Branch }}-{{ .Environment.CIRCLE_TAG }}
       - run:
           name: Install Go task
-          command: curl -s https://taskfile.org/install.sh | sh
+          command: |
+            mkdir "`pwd`/task"
+            curl -s https://taskfile.org/install.sh | sh -s -- -d -b "`pwd`/task"
       - run:
           name: Unarchiving
-          command: task docker:load
+          command: /go/bin/task/task docker:load
       - run:
           name: Push images to Docker hub
-          command: task docker:push
+          command: /go/bin/task/task docker:push
 workflows:
   version: 2
   default:
