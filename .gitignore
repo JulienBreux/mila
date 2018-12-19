@@ -4,6 +4,9 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# Editor
+.vscode
+
 # Application
 .mila.yaml
 bin-mila
